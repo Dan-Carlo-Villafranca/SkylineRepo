@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SkyLine Admin | Add Flights</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='adminstyle.css') }}">
+    
+</head>
+<body style="height: fit-content;">
+    <div class="header">
+        <h2 style="margin: 32px auto auto 20px;">SkyLine Admin</h2>
+    </div>
+<div class="allbody" style="display: flex;">
+    <!-- NAVIGATION -->
+        <div class="nav" style="width: 200px;height: 100vh; position: fixed; top: 100px">
+            <ul >
+                <li class="major"><a href="{{ url_for('index') }}">&#9992; Home</a></li>
+                <li class="major"><a href="#">&#9992; Tickets</a></li>
+                    <li class="minor"><a href="{{ url_for('addtickets') }}">Add Tickets</a></li>
+                    <li class="minor"><a href="{{ url_for('edittickets') }}">Edit Tickets</a></li>
+                    <li class="minor"><a href="{{ url_for('addpromos') }}">Add Promos</a></li>
+                    <li class="minor"><a href="{{ url_for('editpromos') }}">Edit Promos</a></li>
+                    <li class="minor"><a href="{{ url_for('archivetickets') }}">Archived Tickets</a></li>
+                    <li class="minor"><a href="{{ url_for('archivepromos') }}">Archived Tickets</a></li>                     
+                <li class="major"><a href="#">&#9992; Booking</a></li>
+                    <li class="minor"><a href="{{ url_for('managebook') }}">Manage Bookings</a></li>
+                    <li class="minor"><a href="{{ url_for('archivebook') }}">Archived Bookings</a></li>
+                <li class="major"><a href="#">&#9992; Users</a></li>
+                    <li class="minor"><a href="{{ url_for('manageuser') }}">Manage Users</a></li>
+                <li class="major"><a href="{{ url_for('logs') }}">&#9992; Logs</a></li>
+            </ul>
+        </div>
+        <!-- FORMS -->       
+        
+
+</div>
+    </body>
+</html>

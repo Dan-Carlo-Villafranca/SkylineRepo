@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<!-- BODY -->
+    <body class="body">
+        <!-- NAVIGATIONS -->
+        <div class="nav">
+            <div class="logo"><h1>SkyLine</h1></div>
+
+            <ul class="nav-container">
+                <li class="nav-buttons"><a href="{{ url_for('index') }}">Home<hr class="n1"></a></li>
+                <li class="nav-buttons"><a href="{{ url_for('booking') }}">Bookings<hr class="n2"></a></li>
+                <li class="nav-buttons"><a href="#">Popular<hr class="n3"></a></li>
+                <li class="nav-buttons">
+                    <a href="#">Travel info<hr class="n3" style="width: 100%;"></a>
+                    <ul class="dropdown">
+                        <li><a href="{{ url_for('baggage') }}">Baggage information</a></li>
+                        <li><a href="{{ url_for('payment') }}">Payment options</a></li>                          
+                        <li><a href="{{ url_for('bookinginfo') }}">Booking and Check-in</a></li>                     
+                        <li><a href="{{ url_for('specialassist') }}">Special Assistance</a></li>
+                        <li><a href="{{ url_for('policies') }}">Airline policies</a></li>                        
+                    </ul>
+                </li>
+
+                <li class="nav-buttons"><a href="{{ url_for('about') }}#about">About Us<hr class="n4"></a></li>
+                <li class="nav-buttons"><a href="{{ url_for('contact') }}#contact">Contacts<hr class="n5"></a></li>
+            </ul>
+
+            <button class="log-in"><a style="font-family: 'Bookman Old Style';" href="{{ url_for('login') }}">Log In</a></button>
+        </div>
+        <!-- HERO SECTION -->
+        <div class="hero"> 
+            <!-- HERO LEFT -->
+            <div class="left-hero">
+                <h1>FLY HIGH</h1>
+                <hr style="width: 60%;">
+                <!-- neuviseon was hereeeee -->
+                <hr style="width: 55%;">                
+                <hr style="width: 50%;">
+                <h3>WHERE DO YOU WANT TO</h3>
+                <h2>EXPLORE?</h2>
+
+                <button class="hero-btn">BOOK NOW</button>
+            </div>
+            <!-- HERO LEFT -->
+            <div class="right-hero">
+                <h4>Popular Destination </h4>
+                <br>
+                <h2 style="margin: 0;padding: 0; font-size: 20px;">BOOK A FLIGHT TO</h2>
+                <h1 id="popular-place" style="margin: 0;padding: 0;">JAPAN</h1>
+                <img src="static/images/popular.png" id="popular-img">  
+                <p id="popular-desc">Osaka, Japan &#127800;</p>
+            </div>
+        </div>
+        <!-- GALLERY -->
+
+        <div class="gallery">
+            <div class="gallery-container">
+                <div class="gallery-top">
+                    <div class="gallery-img" id="gallery-1" style="background-image: url(static/images/boracay.jpg);"><span>&#9992;</span></div>
+                    <div class="gallery-img" id="gallery-2" style="background-image: url(static/images/china.webp);"><span>&#9992;</span></div>
+                    <div class="gallery-img" id="gallery-3" style="background-image: url(static/images/london.avif);"><span>&#9992;</span></div>
+                </div>
+                <div class="gallery-bottom">
+                    <div class="gallery-img" id="gallery-4" style="background-image: url(static/images/brazil.jpg);"><span>&#9992;</span></div>
+                    <div class="gallery-img" id="gallery-5" style="background-image: url(static/images/australia.webp);"><span>&#9992;</span></div>    
+                </div>
+            </div>
+        </div>
+
+        <!-- ABOUT US SECTION -->
+        <div class="about" id="about">
+            <!-- left ABOUT-->
+            <div class="about-left">
+                <div class="a-l">
+                    <h1>About Us &#9992;</h1>
+                    <hr style="width:55%;">
+                    <hr style="width:45%;">
+                    <hr style="width:35%;">
+                    <p>At Skyline, we are driven by a singular passion: 
+                        connecting you to the world with unparalleled ease. 
+                        We believe that every journey is an opportunity for discovery, 
+                        and we are honored to be the bridge between you and your next 
+                        great adventure.</p><br>                        
+                    <p>As a premier, trusted global airline, our foundation is built 
+                        on an unwavering commitment to safety, reliability, and the 
+                        highest standards of passenger comfort. We don't just fly; we 
+                        strive to provide a seamless sanctuary in the sky, ensuring you 
+                        arrive at your favorite destinations feeling refreshed and 
+                        inspired.</p><br>
+                    <p>With a state-of-the-art modern fleet and a world-class team 
+                        dedicated to exceptional service, we go above and beyond to make 
+                        your travel experience truly unforgettable. From the moment you 
+                        book until you touch down, our focus remains on the small details 
+                        that make a big difference.</p><br>
+                    <p>Whether you are traveling for business or escaping for leisure, 
+                        Skyline is here to elevate your journey. Let us take you further, 
+                        faster, and with the care you deserve. Your world is waiting
+                        —we’re here to take you there.</p><br>
+                </div>        
+            </div>
+
+            <!-- right ABOUT-->
+            <div class="about-right">
+                <div class="right-above"></div>
+
+                <div class="right-below">
+                    <div class="founder-info">
+                        <ul>
+                            <li>FOUNDER</li>
+                            <li>Name : Xeno Wingfield</li>
+                            <li>Email : xeno_hw@gmail.com</li>
+                            <li>Contact : 09254515154</li>
+                        </ul>
+                    </div>
+                    <div class="founder-image"></div>       
+                </div>
+            </div>
+        </div>
+        <!-- CONTACT SECTION -->
+         <div class="contact" id="contact">
+            <div class="contact-container">
+                <div class="cont-left">
+                    <h1>Have a<br>Question?</h1>
+                    <p>We’re here to help! Fill out the form or reach us via email
+                         or phone. Our Customer Care Team is available to help you 
+                         get the best experience out of K18 Hair whether you have 
+                         an issue about your order or looking for helpful hair tips.
+                        <br><br>Everyone gets a personalized response, so please allow 
+                        24 hours during business hours for a reply. Our business 
+                        hours are M-F from 9am to 5pm PT.</p>
+                        <br>
+                    <p style="font-family: 'Bookman Old Style'; margin:0;">Email: hello@gmail.com</p>
+                    <p style="font-family: 'Bookman Old Style'; margin:0;">Phone: 1 844-564-0382</p>
+                    <p style="font-family: 'Bookman Old Style'; margin:0;">Chat: chat with us </p>
+                </div>
+                <div class="cont-right">
+                    <div style="margin: 30px 60px;">
+                        <div class="upper-forms">
+                            <input type="text" name="fname" id="fname" placeholder="First name">
+                            <input type="text" name="lname" id="lname" placeholder="Last name">
+                        </div>
+                            <input type="email" name="email" id="email" placeholder="Email"><br>
+                            <input type="text" name="number" id="number" placeholder="Phone Number (optional)"><br>
+                            <input type="text" name="topic" id="topic" placeholder="What about?"><br>
+                            <textarea id="message" name="message" placeholder="Enter message here . . ."></textarea>
+                            <br>
+                            <button class="button">Submit</button>
+                    </div>
+                </div>
+            </div>
+         </div>
+        <!-- FOOTER SECTION -->
+        <div class="footer">
+            <div class="logo"></div>
+            <div class="buttons">
+                <ul class="footer-buttons">
+                    <li class="footer-buttons"><a href="#about">About Us</a></li>
+                    <li class="footer-buttons"><a href="#contact">Contact</a></li>
+                    <li class="footer-buttons"><a href="#">Terms</a></li>
+                </ul>
+            </div>
+            <hr>
+            <h2>Alta Volare! &#9992;</h5>
+        </div>
+    </body>
+</html>
