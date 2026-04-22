@@ -1,0 +1,30 @@
+4/22/2026 SkyLine Update
+
+Login:
+- (pending) need successful login message
+- (done) page redirection with session -- and log out button
+
+Register:
+- (done) add user
+- (done) hash password to db -- using MCF hashing
+
+
+
+General Notes:
+- (pending) 'Book Now' button in index.html needs function
+- (pending) 'Submit' button in FAQs
+
+
+Edited files:
+1. App.py
+- Added new functions such as log out.
+- Edited a bunch of features such as register creds, password hashing (MCF hashing), imported files
+
+2. index.html
+- Added Session Dislay (name of the current user logged in the system)
+
+3. Login.html
+- Log In button functionality continuation (redirection to session index.html)
+
+4. skyline.db
+- Changed Data Size of Password to 255 due to password Hashing to avoid error

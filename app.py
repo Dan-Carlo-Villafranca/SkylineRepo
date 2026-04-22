@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.secret_key = "skyline_super_secret"
@@ -209,14 +210,34 @@ def logs():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
-        user = User.query.filter_by(email=email, password=password).first()
-        if user:
-            return f"Welcome back, {user.first_name}!"
-        return "Invalid login."
+        user = User.query.filter_by(email=email).first()
+
+        if user and check_password_hash(user.password, password):
+            # Log In with the specific ID
+            session['user_id'] = user.id
+            session['first_name'] = user.first_name
+            
+            # Success Message
+            flash(f"Welcome back, {user.first_name}!")  
+            
+            # 3. Send to home page
+            return redirect(url_for('index'))
+        
+        # If login fails
+        flash("Invalid email or password.")
+        return redirect(url_for('login'))
+
     return render_template('login.html')
+
+#New Code Added (log out)
+@app.route('/logout')
+def logout():
+    session.clear()  # Removes all data from the session
+    return redirect(url_for('index'))
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -235,8 +256,13 @@ def signup():
         if User.query.filter_by(email=email).first():
             return "Email already exists!"
 
+        # Hash the password before saving
+        hashed_pw = generate_password_hash(pw, method='scrypt')
+
+        # Create user using the hashed_pw instead of raw pw
+        new_user = User(first_name=fname, last_name=lname, yob=yob, email=email, password=hashed_pw)
+        
         # put shit in db
-        new_user = User(first_name=fname, last_name=lname, yob=yob, email=email, password=pw)
         db.session.add(new_user)
         db.session.commit()
         
