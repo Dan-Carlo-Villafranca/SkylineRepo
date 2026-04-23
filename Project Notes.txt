@@ -1,21 +1,26 @@
 4/22/2026 SkyLine Update
 
+\\\\\\\\\\\\\\\\\\\\\\\\\\
+M A I N  F U N C T I O N S
+\\\\\\\\\\\\\\\\\\\\\\\\\\
+
 Login:
 - (pending) need successful login message
-- (done) page redirection with session -- and log out button
 
 Register:
-- (done) add user
-- (done) hash password to db -- using MCF hashing
+- (pending) registration successful message/popup
+
+Checkout:
+- Checked out a ticket named "Limp Bizkit"
 
 
 
 General Notes:
-- (pending) 'Book Now' button in index.html needs function
+- (Done 4/23/26) 'Book Now' button in index.html needs function
 - (pending) 'Submit' button in FAQs
 
 
-Edited files:
+Edited files: (4/22/26)
 1. App.py
 - Added new functions such as log out.
 - Edited a bunch of features such as register creds, password hashing (MCF hashing), imported files
@@ -28,3 +33,25 @@ Edited files:
 
 4. skyline.db
 - Changed Data Size of Password to 255 due to password Hashing to avoid error
+
+---------------------------------------
+Edited Files: (4/23/26)
+1. index.html
+- added session display
+- 'Book Now' button is now functioning
+- Functional 'Popular' button
+
+2. booking.html
+- added session display
+- edited title line
+
+3. popular.html
+- added session display
+- edited title line
+
+4. baggage.html
+- added session display
+- edited title line
+
+5. checkout.html
+- added session display
