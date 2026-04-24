@@ -16,6 +16,11 @@
             <ul class="nav-container">
                 <li class="nav-buttons"><a href="{{ url_for('index') }}">Home<hr class="n1"></a></li>
                 <li class="nav-buttons"><a href="{{ url_for('booking') }}">Bookings<hr class="n2"></a></li>
+                {% if session.get('role') == 'admin' %}
+                    <li class="nav-buttons" style="background: rgba(255, 215, 0, 0.2); border-radius: 5px;">
+                        <a href="{{ url_for('admin_dashboard') }}" style="color: gold !important;">Admin Panel<hr class="n3"></a>
+                    </li>
+                {% endif %}
                 <li class="nav-buttons"><a href="{{ url_for('popular') }}">Popular<hr class="n3"></a></li>
                 <li class="nav-buttons">
                     <a href="#">Travel info
@@ -40,13 +45,19 @@
                                 Welcome, {{ session['first_name'] }}!
                             </span>
                             
-                            <!-- For clickable avatar to booked flights page -->
+                            {% if session.get('role') == 'admin' %}
+                                <a href="{{ url_for('admin_dashboard') }}" 
+                                style="color: #ffd700; font-size: 0.7rem; text-decoration: none; text-transform: uppercase; font-family: sans-serif; font-weight: bold; border: 1px solid #ffd700; padding: 4px 8px; border-radius: 4px;">
+                                Admin Panel
+                                </a>
+                            {% endif %}
+
                             <a href="{{ url_for('bookedflights') }}" style="text-decoration: none;">
-                            <div class="avatar-circle" style="width: 38px; height: 38px; background-color: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                <svg viewBox="0 0 24 24" fill="#555" width="24px" height="24px">
-                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                                </svg>
-                            </div>
+                                <div class="avatar-circle" style="width: 38px; height: 38px; background-color: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <svg viewBox="0 0 24 24" fill="#555" width="24px" height="24px">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                </div>
                             </a>
 
                             <a href="{{ url_for('logout') }}" style="color: #ff4d4d; font-size: 0.7rem; text-decoration: none; text-transform: uppercase; font-family: sans-serif; font-weight: bold;">Logout</a>

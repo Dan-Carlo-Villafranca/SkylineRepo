@@ -19,6 +19,7 @@ class User(db.Model):
     yob = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
+    role = db.Column(db.String(20), default='user')
 class Flight(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     from_country = db.Column(db.String(50), nullable=False)
@@ -220,9 +221,15 @@ def login():
         password = request.form.get('password')
         user = User.query.filter_by(email=email).first()
 
+        # Check if the account exists at all
+        if not user:
+            flash("No account exists with this email. Please sign up!", "error")
+            return redirect(url_for('login'))
+        
         if user and check_password_hash(user.password, password):
             # Log In with the specific ID
             session['user_id'] = user.id
+            session['role'] = user.role
             session['first_name'] = user.first_name
             
             # Success Message
@@ -270,6 +277,8 @@ def signup():
         db.session.add(new_user)
         db.session.commit()
         
+        # Success Alert: This will show up on the Login page after redirect
+        flash("Registration Successful! You can now log in.", "success")
         return redirect(url_for('login'))
 
     return render_template('signup.html')
@@ -360,6 +369,23 @@ def bookedflights():
     
     return render_template('bookedflights.html', purchased_tickets=user_tickets)
 
+@app.route('/admin_dashboard')
+def admin_dashboard():
+    # Security Check: Only let admins in
+    if session.get('role') != 'admin':
+        flash("Unauthorized access!")
+        return redirect(url_for('index'))
+
+    # Fetch all data for the tables
+    all_flights = Flight.query.all()
+    all_bookings = Booking.query.order_by(Booking.id.desc()).all()
+    all_users = User.query.all()
+
+    return render_template('admin.html', 
+                           flights=all_flights, 
+                           bookings=all_bookings, 
+                           users=all_users)
+
 @app.route('/process_booking/<int:flight_id>', methods=['POST'])
 def process_booking(flight_id):
     flight = Flight.query.get_or_404(flight_id)
@@ -373,11 +399,21 @@ def process_booking(flight_id):
         total_amount = float(raw_total) if raw_total else 0.0
 
         for i in range(1, p_count + 1):
+            # 1. Update the Flight Inventory (Auto-decrement)
+            if tier == 'economy':
+                flight.tickets_economy -= 1
+            elif tier == 'business':
+                flight.tickets_business -= 1
+            elif tier == 'first':
+                flight.tickets_first -= 1
             new_booking = Booking(
                 user_id=session.get('user_id'),
                 flight_id=flight.id,
                 first_name=request.form.get(f'first_name_{i}'),
+                middle_initial=request.form.get(f'mi_{i}'),
                 last_name=request.form.get(f'last_name_{i}'),
+                dob=request.form.get(f'dob_{i}'),
+                nationality=request.form.get(f'nationality_{i}'),
                 tier=tier,
                 seat_number=request.form.get('selected_seat') if i == 1 else "Auto-Assigned",
                 total_paid=total_amount / p_count # This line crashes if total_amount is None
@@ -395,8 +431,6 @@ def process_booking(flight_id):
         return render_template('checkout.html', 
                                flight=flight, 
                                calc_arrival=calculate_arrival)
-
-    
 
 if __name__ == '__main__':
     with app.app_context():

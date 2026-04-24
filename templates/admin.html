@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyLine | Admin Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .admin-container { max-width: 1200px; margin: 40px auto; padding: 20px; font-family: sans-serif; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 30px; }
+        .admin-section { background: rgba(255, 255, 255, 0.95); padding: 25px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .admin-section h2 { margin-top: 0; color: #004d4d; border-bottom: 2px solid #004d4d; padding-bottom: 10px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #004d4d; color: white; }
+        tr:hover { background-color: #f5f5f5; }
+
+        .btn-add { background: #004d4d; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; }
+        .btn-delete { background: #ff4d4d; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer; text-decoration: none; font-size: 12px; }
+        .status-pill { padding: 4px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .status-admin { background: #ffd700; color: #000; }
+        .status-user { background: #004d4d; color: #fff; }
+    </style>
+</head>
+<body style="background-image: url('{{ url_for('static', filename='images/booking.webp') }}'); background-size: cover; background-attachment: fixed;">
+
+    <div class="nav">
+        <div class="logo"><h1>SkyLine</h1></div>
+        <ul class="nav-container">
+            <li class="nav-buttons"><a href="{{ url_for('index') }}">Home</a></li>
+            <li class="nav-buttons"><a href="{{ url_for('booking') }}">Bookings</a></li>
+            <li style="background: gold; border-radius: 5px;"><a href="{{ url_for('admin_dashboard') }}" style="color: black !important;">ADMIN PANEL</a></li>
+            <li class="nav-buttons"><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </div>
+
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Admin Control Center</h1>
+            <p>Logged in as: <strong>{{ session.get('first_name') }}</strong></p>
+        </div>
+
+        <div class="admin-section">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Manage Flights</h2>
+                <a href="#" class="btn-add">+ Add New Flight</a>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Route</th>
+                        <th>Departure</th>
+                        <th>Seats (E/B/F)</th>
+                        <th>Price</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for flight in flights %}
+                    <tr>
+                        <td>#{{ flight.id }}</td>
+                        <td>{{ flight.from_city }} &rarr; {{ flight.to_city }}</td>
+                        <td>{{ flight.dep_date }} ({{ flight.dep_time }})</td>
+                        <td>{{ flight.tickets_economy }} / {{ flight.tickets_business }} / {{ flight.tickets_first }}</td>
+                        <td>PHP {{ "{:,.2f}".format(flight.price) }}</td>
+                        <td>
+                            <a href="#" class="btn-delete">Cancel</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="admin-section">
+            <h2>Recent Transactions</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ref</th>
+                        <th>Passenger</th>
+                        <th>Flight</th>
+                        <th>Tier</th>
+                        <th>Paid</th>
+                        <th>Seat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in bookings %}
+                    <tr>
+                        <td>#SKY{{ ticket.id }}</td>
+                        <td>{{ ticket.first_name }} {{ ticket.last_name }}</td>
+                        <td>#FL{{ ticket.flight_id }}</td>
+                        <td>{{ ticket.tier|capitalize }}</td>
+                        <td>PHP {{ "{:,.2f}".format(ticket.total_paid) }}</td>
+                        <td>{{ ticket.seat_number }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="admin-section">
+            <h2>Registered Users</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td>{{ u.id }}</td>
+                        <td>{{ u.first_name }} {{ u.last_name }}</td>
+                        <td>{{ u.email }}</td>
+                        <td>
+                            <span class="status-pill {{ 'status-admin' if u.role == 'admin' else 'status-user' }}">
+                                {{ u.role }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="logo"></div>
+        <hr>
+        <h5>SkyLine Administrative Console &#9992;</h5>
+    </div>
+
+</body>
+</html>
