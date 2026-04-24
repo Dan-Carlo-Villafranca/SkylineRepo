@@ -38,7 +38,10 @@ class Flight(db.Model):
     trip_type=db.Column(db.String(50), nullable=False)
 class Booking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    # added line 'user_id' 4 24 26 @4:31pm
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) 
     flight_id = db.Column(db.Integer, db.ForeignKey('flight.id'), nullable=False)
+    flight = db.relationship('Flight', backref='bookings')
     # Personal Info
     first_name = db.Column(db.String(100))
     middle_initial = db.Column(db.String(1))
@@ -108,9 +111,10 @@ def booking():
     flights = query.all()
     return render_template('booking.html', flights=flights, calc_arrival=calculate_arrival)
 
-@app.route('/checkout/<int:flight_id>')
+@app.route('/checkout/<int:flight_id>', methods=['GET', 'POST'])
 def checkout(flight_id):
     flight = Flight.query.get_or_404(flight_id)
+    # This now only handles showing the page (GET)
     return render_template('checkout.html', flight=flight, calc_arrival=calculate_arrival)
 
 @app.route('/book_flight/<int:flight_id>')
@@ -345,50 +349,54 @@ def addticketsround():
 
     return render_template('addticketsround.html')
 
+@app.route('/booked-flights')
+def bookedflights():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    # This matches the loop name we used in the HTML: {% for ticket in purchased_tickets %}
+    # We query the Booking table for tickets belonging to the logged-in user
+    user_tickets = Booking.query.filter_by(user_id=session['user_id']).all()
+    
+    return render_template('bookedflights.html', purchased_tickets=user_tickets)
+
 @app.route('/process_booking/<int:flight_id>', methods=['POST'])
 def process_booking(flight_id):
     flight = Flight.query.get_or_404(flight_id)
     
-    # Get form data
-    tier = request.form.get('tier_choice')
-    p_count = int(request.form.get('p_count', 1))
-    payment_method = request.form.get('payment_method')
-    total_paid = float(request.form.get('total_amount', 0))
+    try:
+        p_count = int(request.form.get('p_count', 1))
+        tier = request.form.get('tier_choice', 'economy')
+        
+        # SAFETY CHECK: If the hidden input was empty, use 0.0
+        raw_total = request.form.get('total_amount')
+        total_amount = float(raw_total) if raw_total else 0.0
 
-    # We loop through based on the number of passengers
-    for i in range(1, p_count + 1):
-        # Update Inventory based on Tier
-        if tier == 'economy':
-            current_seats = flight.tickets_economy
-            flight.tickets_economy -= 1
-        elif tier == 'business':
-            current_seats = flight.tickets_business
-            flight.tickets_business -= 1
-        else:
-            current_seats = flight.tickets_first
-            flight.tickets_first -= 1
+        for i in range(1, p_count + 1):
+            new_booking = Booking(
+                user_id=session.get('user_id'),
+                flight_id=flight.id,
+                first_name=request.form.get(f'first_name_{i}'),
+                last_name=request.form.get(f'last_name_{i}'),
+                tier=tier,
+                seat_number=request.form.get('selected_seat') if i == 1 else "Auto-Assigned",
+                total_paid=total_amount / p_count # This line crashes if total_amount is None
+            )
+            db.session.add(new_booking)
+            
+        db.session.commit()
+        return redirect(url_for('bookedflights'))
 
-        # Create unique booking for each passenger
-        new_booking = Booking(
-            flight_id=flight.id,
-            first_name=request.form.get(f'first_name_{i}'),
-            middle_initial=request.form.get(f'mi_{i}'),
-            last_name=request.form.get(f'last_name_{i}'),
-            suffix=request.form.get(f'suffix_{i}'),
-            dob=request.form.get(f'dob_{i}'),
-            nationality=request.form.get(f'nationality_{i}'),
-            status=request.form.get(f'status_{i}'), # e.g. "Senior"
-            tier=tier,
-            seat_number=request.form.get('selected_seat') if i == 1 else "Auto-Assigned",
-            total_paid=total_paid / p_count, # Split total among tickets
-            payment_method=payment_method,
-            seats_remaining_after=flight.tickets_economy if tier == 'economy' else (flight.tickets_business if tier == 'business' else flight.tickets_first)
-        )
-        db.session.add(new_booking)
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error: {e}")
+        flash("There was an error processing your booking.")
+        # --- FIX IS HERE: Added calc_arrival ---
+        return render_template('checkout.html', 
+                               flight=flight, 
+                               calc_arrival=calculate_arrival)
 
-    db.session.commit()
-    flash(f"Success! {p_count} ticket(s) have been booked.")
-    return redirect(url_for('index'))
+    
 
 if __name__ == '__main__':
     with app.app_context():

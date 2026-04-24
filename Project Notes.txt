@@ -55,3 +55,12 @@ Edited Files: (4/23/26)
 
 5. checkout.html
 - added session display
+
+---------------------------------------
+Edited Files: (4/24/26)
+1. index.html
+- avatar button redirection to booked flights of the current user
+
+NOTE: Basically most of the html files is edited, gibutangan sa clickable avatar
+
+2. bookedflights.html (new file added today)
