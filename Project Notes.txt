@@ -4,14 +4,21 @@
 M A I N  F U N C T I O N S
 \\\\\\\\\\\\\\\\\\\\\\\\\\
 
-Login:
-- (pending) need successful login message
 
-Register:
-- (pending) registration successful message/popup
+Patch Update (4/25/26 @11:52pm)
 
-Checkout:
-- Checked out a ticket named "Limp Bizkit"
+New Features Added:
+- Functional 'Add New Flight' / ticket button
+- Functional 'Add One Way' & 'Add Round Trip' button and Data Creation
+- Functional Remove/Delete Button in Flight Management Page
+- Functional Edit Button in Flight Management Page (need fix page format and functionality sa ubang part sa text fields)
+- Reflective 'Recent Transaction' under Sub-Navigation Admin Panel
+- Reflective 'Registered Users' (WALA PANI CRUD)
+- Session Management Disposal is functional
+
+
+
+
 
 
 

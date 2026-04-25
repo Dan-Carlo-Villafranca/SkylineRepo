@@ -12,6 +12,20 @@ db = SQLAlchemy(app)
 # start
 
 # Updated Model with more details
+COUNTRIES_LIST = [
+    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", 
+    "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", 
+    "Belgium", "Belize", "Bolivia", "Brazil", "Canada", "Chile", "China", "Colombia", 
+    "Croatia", "Cuba", "Czech Republic", "Denmark", "Egypt", "Ethiopia", "Fiji", 
+    "Finland", "France", "Germany", "Greece", "Hong Kong", "Hungary", "Iceland", 
+    "India", "Indonesia", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", 
+    "Kenya", "Kuwait", "Lebanon", "Malaysia", "Maldives", "Mexico", "Morocco", 
+    "Netherlands", "New Zealand", "Nigeria", "Norway", "Oman", "Pakistan", "Panama", 
+    "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Russia", "Saudi Arabia", 
+    "Singapore", "South Africa", "South Korea", "Spain", "Sri Lanka", "Sweden", 
+    "Switzerland", "Taiwan", "Thailand", "Turkey", "Ukraine", "United Arab Emirates", 
+    "United Kingdom", "Vietnam"
+]
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(50), nullable=False)
@@ -64,6 +78,14 @@ class Booking(db.Model):
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.after_request
+def add_header(response):
+    # This tells the browser NOT to cache the page
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 @app.route('/booking')
 def booking():
@@ -174,9 +196,31 @@ def calculate_arrival(start_time_str, duration_str):
         # If the user typed the duration wrong (like "12 hours"), return a placeholder
         return "--:--"
 
-@app.route('/edittickets')
-def edittickets():
-    return render_template('index.html')
+@app.route('/edittickets/<int:flight_id>', methods=['GET', 'POST'])
+def edittickets(flight_id):
+    # Find the flight you clicked on
+    flight = Flight.query.get_or_404(flight_id)
+
+    if request.method == 'POST':
+        try:
+            # Update the flight details
+            flight.from_city = request.form.get('from_city')
+            flight.to_city = request.form.get('to_city')
+            flight.dep_date = request.form.get('dep_date')
+            flight.dep_time = request.form.get('dep_time')
+            flight.ret_date = request.form.get('ret_date')
+            flight.ret_time = request.form.get('ret_time')
+            flight.price = float(request.form.get('price') or 0)
+            
+            db.session.commit()
+            flash("Flight Updated Successfully!")
+            return redirect(url_for('admin_dashboard'))
+        except Exception as e:
+            db.session.rollback()
+            return f"Error: {e}"
+
+    # Load the edittickets.html page and send the flight data to it
+    return render_template('edittickets.html', flight=flight)
 
 @app.route('/addpromos')
 def addpromos():
@@ -248,7 +292,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.clear()  # Removes all data from the session
-    return redirect(url_for('index'))
+    return redirect(url_for('login'))
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -285,44 +329,68 @@ def signup():
 
 @app.route('/addtickets', methods=['GET', 'POST'])
 def addtickets():
+    # List of countries to keep the dropdowns populated on GET requests
+    countries_list = ["Afghanistan", "Australia", "Japan", "Philippines", "United States"]
+    
     if request.method == 'POST':
-        # 1. Determine Trip Type String
-        trip_type_value = "one way trip"
-
-        # 2. Handle Price Logic
-        raw_price = float(request.form.get('price', 0))
-        final_price = raw_price * 2 if is_round_trip else raw_price
-        ret_date= "none"
-        ret_time= "none"
-        # 3. Create the Flight Object
-        new_flight = Flight(
-            from_country=request.form.get('from_country'),
-            from_city=request.form.get('from_city'),
-            to_country=request.form.get('to_country'),
-            to_city=request.form.get('to_city'),
-            dep_date=request.form.get('dep_date'),
-            dep_time=request.form.get('dep_time'),
-
-            ret_date=ret_date,
-            ret_time=ret_time,
-
-            duration=request.form.get('duration'),
-            tickets_economy=request.form.get('tickets_economy'),
-            tickets_business=request.form.get('tickets_business'),
-            tickets_first=request.form.get('tickets_first'),
+        try:
+            # 1. DATA EXTRACTION: Get basic strings from the form
+            from_country = request.form.get('from_country')
+            from_city = request.form.get('from_city')
+            to_country = request.form.get('to_country')
+            to_city = request.form.get('to_city')
             
-            # Use our new calculated values
-            trip_type=trip_type_value, 
-            price=final_price,
-            
-            promo_code=request.form.get('promo_code')
-        )
-        
-        db.session.add(new_flight)
-        db.session.commit()
-        return "Flight Added! <a href='/addtickets'>Back</a>"
+            # 2. VALIDATION: Prevent adding a flight to/from the same location
+            if from_city == to_city:
+                flash("Error: Origin and Destination cities cannot be the same.")
+                # Pass countries_list back so the form doesn't break
+                return render_template('addtickets.html', countries=countries_list)
 
-    return render_template('addtickets.html')
+            # 3. NUMERIC HANDLING: Using 'or 0' is the most important fix here.
+            # This prevents the 'ValueError: invalid literal for int() with base 10: ""' crash.
+            economy_seats = int(request.form.get('tickets_economy') or 0)
+            business_seats = int(request.form.get('tickets_business') or 0)
+            first_seats = int(request.form.get('tickets_first') or 0)
+            flight_price = float(request.form.get('price') or 0)
+
+            # 4. OBJECT CREATION: Mapping the form data to your SQLAlchemy Flight Model
+            new_flight = Flight(
+                from_country=from_country,
+                from_city=from_city,
+                to_country=to_country,
+                to_city=to_city,
+                dep_date=request.form.get('dep_date'),
+                dep_time=request.form.get('dep_time'),
+                # Explicitly setting these as strings to avoid NULL constraint errors in SQLite
+                ret_date="none",
+                ret_time="none",
+                duration=request.form.get('duration') or "N/A",
+                tickets_economy=economy_seats,
+                tickets_business=business_seats,
+                tickets_first=first_seats,
+                trip_type="one way trip", # Hardcoded for this specific 'add' logic
+                price=flight_price,
+                # Defaulting to 'none' if the dropdown value is missing
+                promo_code=request.form.get('promo_code') or "none"
+            )
+            
+            # 5. DATABASE COMMANDS: Standard Add and Commit
+            db.session.add(new_flight)
+            db.session.commit()
+            
+            # 6. UI FEEDBACK: Redirect to the dashboard to see the new entry
+            flash("Flight Created Successfully!")
+            return redirect(url_for('admin_dashboard'))
+
+        except Exception as e:
+            # 7. CRITICAL ERROR HANDLING: Rollback prevents "Session is inactive" errors
+            # if you try to add another ticket after a failure.
+            db.session.rollback()
+            print(f"System Log - Add Flight Failure: {e}") 
+            return f"Error: {e}. Please ensure all required fields are filled."
+
+    # Return the template for the GET request, including the countries list
+    return render_template('addtickets.html', countries=COUNTRIES_LIST)
 
 @app.route('/addticketsround', methods=['GET', 'POST'])
 def addticketsround():
@@ -354,9 +422,18 @@ def addticketsround():
         
         db.session.add(new_flight)
         db.session.commit()
-        return "Flight Added! <a href='/addticketsround'>Back</a>"
+        # Use redirect so you can see the new flight in the dashboard immediately
+        flash("Round-Trip Flight Added Successfully!")
+        return redirect(url_for('admin_dashboard'))
 
-    return render_template('addticketsround.html')
+    return render_template('addticketsround.html', countries=COUNTRIES_LIST)
+
+@app.route('/delete_flight/<int:flight_id>', methods=['POST'])
+def delete_flight(flight_id):
+    flight = Flight.query.get_or_404(flight_id)
+    db.session.delete(flight)
+    db.session.commit()
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/booked-flights')
 def bookedflights():
@@ -379,7 +456,8 @@ def admin_dashboard():
     # Fetch all data for the tables
     all_flights = Flight.query.all()
     all_bookings = Booking.query.order_by(Booking.id.desc()).all()
-    all_users = User.query.all()
+    # Sort users so 'admin' comes before 'user' alphabetically
+    all_users = User.query.order_by(User.role.asc()).all()
 
     return render_template('admin.html', 
                            flights=all_flights, 

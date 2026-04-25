@@ -6,136 +6,258 @@
     <title>SkyLine | Admin Panel</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        .admin-container { max-width: 1200px; margin: 40px auto; padding: 20px; font-family: sans-serif; }
-        .admin-header { display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 30px; }
-        .admin-section { background: rgba(255, 255, 255, 0.95); padding: 25px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .admin-section h2 { margin-top: 0; color: #004d4d; border-bottom: 2px solid #004d4d; padding-bottom: 10px; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #004d4d; color: white; }
-        tr:hover { background-color: #f5f5f5; }
+        /* 1. Page-Specific Background (Covers entire screen) */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
 
-        .btn-add { background: #004d4d; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; }
-        .btn-delete { background: #ff4d4d; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer; text-decoration: none; font-size: 12px; }
-        .status-pill { padding: 4px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .admin-body {
+            background-image: url('{{ url_for("static", filename="images/booking.webp") }}') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            background-attachment: fixed !important;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 2. Larger Wrapper Layout */
+        .admin-wrapper { 
+            display: flex; 
+            max-width: 98%; /* Stretches to fill the screen width */
+            margin: 40px auto; 
+            gap: 30px; 
+            padding: 0 20px; 
+            flex: 1; /* Pushes content to fill vertical space */
+        }
+        
+        /* 3. Larger Sidebar/Sub-nav */
+        .admin-sidebar { 
+            width: 400px; /* Increased width */
+            background: rgba(0, 77, 77, 0.9); 
+            border-radius: 15px; 
+            padding: 30px; 
+            height: fit-content; 
+        }
+        
+        .admin-sidebar h3 { 
+            color: gold; 
+            font-family: sans-serif; 
+            font-size: 1.5rem; /* Larger title */
+            margin-bottom: 25px; 
+            border-bottom: 2px solid gold; 
+            padding-bottom: 10px; 
+        }
+        
+        /* 4. Larger Navigation Buttons */
+        .tab-btn { 
+            width: 100%; 
+            padding: 20px 15px; /* Bigger buttons */
+            margin-bottom: 15px; 
+            border: none; 
+            background: transparent; 
+            color: white; 
+            text-align: left; 
+            cursor: pointer; 
+            font-family: sans-serif; 
+            font-weight: bold; 
+            font-size: 1.1rem; /* Bigger text */
+            border-radius: 8px; 
+            transition: 0.3s; 
+        }
+        .tab-btn:hover { background: rgba(255, 215, 0, 0.2); }
+        .tab-btn.active { background: gold; color: black; }
+
+        /* 5. Larger Content/Table Display */
+        .admin-content { flex: 1; }
+        .admin-section { 
+            display: none; 
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 40px; /* More internal breathing room */
+            border-radius: 15px; 
+            width: 1500px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
+            min-height: 600px; /* Ensures the white box is tall */
+        }
+        .admin-section.active { display: block; animation: fadeIn 0.4s; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-family: sans-serif; }
+        th, td { padding: 18px; text-align: left; border-bottom: 1px solid #ddd; font-size: 1.05rem; }
+        th { background-color: #004d4d; color: white; }
+        
+        .status-pill { padding: 6px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; }
         .status-admin { background: #ffd700; color: #000; }
         .status-user { background: #004d4d; color: #fff; }
     </style>
 </head>
-<body style="background-image: url('{{ url_for('static', filename='images/booking.webp') }}'); background-size: cover; background-attachment: fixed;">
+<body class="admin-body">
 
     <div class="nav">
         <div class="logo"><h1>SkyLine</h1></div>
         <ul class="nav-container">
             <li class="nav-buttons"><a href="{{ url_for('index') }}">Home</a></li>
-            <li class="nav-buttons"><a href="{{ url_for('booking') }}">Bookings</a></li>
-            <li style="background: gold; border-radius: 5px;"><a href="{{ url_for('admin_dashboard') }}" style="color: black !important;">ADMIN PANEL</a></li>
             <li class="nav-buttons"><a href="{{ url_for('logout') }}">Logout</a></li>
         </ul>
-    </div>
-
-    <div class="admin-container">
-        <div class="admin-header">
-            <h1>Admin Control Center</h1>
-            <p>Logged in as: <strong>{{ session.get('first_name') }}</strong></p>
-        </div>
-
-        <div class="admin-section">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h2>Manage Flights</h2>
-                <a href="#" class="btn-add">+ Add New Flight</a>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Route</th>
-                        <th>Departure</th>
-                        <th>Seats (E/B/F)</th>
-                        <th>Price</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for flight in flights %}
-                    <tr>
-                        <td>#{{ flight.id }}</td>
-                        <td>{{ flight.from_city }} &rarr; {{ flight.to_city }}</td>
-                        <td>{{ flight.dep_date }} ({{ flight.dep_time }})</td>
-                        <td>{{ flight.tickets_economy }} / {{ flight.tickets_business }} / {{ flight.tickets_first }}</td>
-                        <td>PHP {{ "{:,.2f}".format(flight.price) }}</td>
-                        <td>
-                            <a href="#" class="btn-delete">Cancel</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div class="admin-section">
-            <h2>Recent Transactions</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Ref</th>
-                        <th>Passenger</th>
-                        <th>Flight</th>
-                        <th>Tier</th>
-                        <th>Paid</th>
-                        <th>Seat</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for ticket in bookings %}
-                    <tr>
-                        <td>#SKY{{ ticket.id }}</td>
-                        <td>{{ ticket.first_name }} {{ ticket.last_name }}</td>
-                        <td>#FL{{ ticket.flight_id }}</td>
-                        <td>{{ ticket.tier|capitalize }}</td>
-                        <td>PHP {{ "{:,.2f}".format(ticket.total_paid) }}</td>
-                        <td>{{ ticket.seat_number }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div class="admin-section">
-            <h2>Registered Users</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for u in users %}
-                    <tr>
-                        <td>{{ u.id }}</td>
-                        <td>{{ u.first_name }} {{ u.last_name }}</td>
-                        <td>{{ u.email }}</td>
-                        <td>
-                            <span class="status-pill {{ 'status-admin' if u.role == 'admin' else 'status-user' }}">
-                                {{ u.role }}
+                        <div class="user-profile" style="display: flex; align-items: center; gap: 12px;">
+                            <span class="user-name" style="color: white; font-family: 'Bookman Old Style'; font-weight: bold;">
+                                Welcome, {{ session['first_name'] }}!
                             </span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+
+                            <a href="{{ url_for('bookedflights') }}" style="text-decoration: none;">
+                                <div class="avatar-circle" style="width: 38px; height: 38px; background-color: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <svg viewBox="0 0 24 24" fill="#555" width="24px" height="24px">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                </div>
+                            </a>
+
+                            <a href="{{ url_for('logout') }}" style="color: #ff4d4d; font-size: 0.7rem; text-decoration: none; text-transform: uppercase; font-family: sans-serif; font-weight: bold;">Logout</a>
+                        </div>   
+    </div>
+
+    <div class="admin-wrapper">
+        <div class="admin-sidebar">
+            <h3>Admin Panel</h3>
+            <button class="tab-btn active" onclick="openTab(event, 'flights')">✈ Manage Flights</button>
+            <button class="tab-btn" onclick="openTab(event, 'transactions')">💳 Recent Transactions</button>
+            <button class="tab-btn" onclick="openTab(event, 'users')">👥 Registered Users</button>
+        </div>
+
+        <div class="admin-content">
+            
+            <div id="flights" class="admin-section active">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="font-size: 2rem; color: #004d4d;">Flight Management</h2>
+                    <a href="{{ url_for('addtickets') }}" style="background: #004d4d; color: white; padding: 12px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">+ Add New Flight</a>
+                </div>
+
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Route</th>
+                            <th>Departure (Date/Time)</th>
+                            <th>Return (Date/Time)</th>
+                            <th>Price</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for flight in flights %}
+                        <tr>
+                            <td>#{{ flight.id }}</td>
+                            <td>
+                                <span class="status-pill" style="background: {{ '#e3f2fd' if flight.trip_type == 'one way trip' else '#f3e5f5' }}; color: black; border: 1px solid #ccc;">
+                                    {{ flight.trip_type|upper }}
+                                </span>
+                            </td>
+                            <td>
+                                <strong>{{ flight.from_city }}</strong> <br> 
+                                <small>to</small> {{ flight.to_city }}
+                            </td>
+                            <td>
+                                {{ flight.dep_date }} <br>
+                                <small style="color: #666;">{{ flight.dep_time }}</small>
+                            </td>
+                            <td>
+                                {% if flight.trip_type == 'round trip' %}
+                                    {{ flight.ret_date }} <br>
+                                    <small style="color: #666;">{{ flight.ret_time }}</small>
+                                {% else %}
+                                    <span style="color: #ccc;">—</span>
+                                {% endif %}
+                            </td>
+                            <td style="font-weight: bold; color: #004d4d;">
+                                PHP {{ "{:,.2f}".format(flight.price) }}
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 8px;">
+                                    <a href="{{ url_for('edittickets', flight_id=flight.id) }}" 
+                                        style="background: #ffa500; color: black; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 0.8rem;">
+                                        Edit
+                                    </a>
+
+                                    <form action="{{ url_for('delete_flight', flight_id=flight.id) }}" method="POST" style="display:inline;">
+                                        <button type="submit" 
+                                                onclick="return confirm('Delete this flight permanentely?')"
+                                                style="background: #ff4d4d; color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem;">
+                                            Remove
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="transactions" class="admin-section">
+                <h2 style="font-size: 2rem; color: #004d4d;">Booking History</h2>
+                <table>
+                    <thead>
+                        <tr><th>Ref</th><th>Passenger</th><th>Tier</th><th>Paid</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in bookings %}
+                        <tr>
+                            <td>#SKY{{ ticket.id }}</td>
+                            <td>{{ ticket.first_name }} {{ ticket.last_name }}</td>
+                            <td>{{ ticket.tier|capitalize }}</td>
+                            <td>PHP {{ "{:,.2f}".format(ticket.total_paid) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="users" class="admin-section">
+                <h2 style="font-size: 2rem; color: #004d4d;">User Directory</h2>
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Full Name</th><th>Email</th><th>Role</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <td>{{ u.id }}</td>
+                            <td>{{ u.first_name }} {{ u.last_name }}</td>
+                            <td>{{ u.email }}</td>
+                            <td>
+                                <span class="status-pill {{ 'status-admin' if u.role == 'admin' else 'status-user' }}">
+                                    {{ u.role|upper }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
         </div>
     </div>
 
-    <div class="footer">
-        <div class="logo"></div>
-        <hr>
-        <h5>SkyLine Administrative Console &#9992;</h5>
-    </div>
-
+    <script>
+        function openTab(evt, tabName) {
+            var i, x, tablinks;
+            x = document.getElementsByClassName("admin-section");
+            for (i = 0; i < x.length; i++) {
+                x[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+    </script>
 </body>
 </html>

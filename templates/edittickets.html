@@ -2,37 +2,241 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SkyLine Admin | Add Flights</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='adminstyle.css') }}">
+    <title>SkyLine Admin | Edit Flight</title> <link rel="stylesheet" href="{{ url_for('static', filename='adminstyle.css') }}">
     
+    <script>
+        const cityData = {
+            "Afghanistan": ["Kabul (KBL)", "Kandahar (KDH)", "Herat (HEA)"],
+            "Albania": ["Tirana (TIA)"],
+            "admin_addticketsadmin_addticketsAlgeria": ["Algiers (ALG)", "Oran (ORN)"],
+            "Andorra": ["Andorra–La Seu d'Urgell (LEU)"],
+            "Angola": ["Luanda (LAD)"],
+            "Argentina": ["Buenos Aires (EZE)", "Córdoba (COR)", "Mendoza (MDZ)"],
+            "Armenia": ["Yerevan (EVN)"],
+            "Australia": ["Sydney (SYD)", "Melbourne (MEL)", "Brisbane (BNE)", "Perth (PER)"],
+            "Austria": ["Vienna (VIE)", "Salzburg (SZG)", "Innsbruck (INN)"],
+            "Azerbaijan": ["Baku (GYD)"],
+            "Bahamas": ["Nassau (NAS)", "Freeport (FPO)"],
+            "Bahrain": ["Bahrain (BAH)"],
+            "Bangladesh": ["Dhaka (DAC)", "Chittagong (CGP)"],
+            "Barbados": ["Bridgetown (BGI)"],
+            "Belgium": ["Brussels (BRU)", "Charleroi (CRL)"],
+            "Belize": ["Belize City (BZE)"],
+            "Bolivia": ["La Paz (LPB)", "Santa Cruz (VVI)"],
+            "Brazil": ["São Paulo (GRU)", "Rio de Janeiro (GIG)", "Brasília (BSB)"],
+            "Canada": ["Toronto (YYZ)", "Vancouver (YVR)", "Montreal (YUL)", "Calgary (YYC)"],
+            "Chile": ["Santiago (SCL)"],
+            "China": ["Beijing (PEK)", "Shanghai (PVG)", "Guangzhou (CAN)", "Shenzhen (SZX)"],
+            "Colombia": ["Bogotá (BOG)", "Medellín (MDE)", "Cali (CLO)"],
+            "Croatia": ["Zagreb (ZAG)", "Split (SPU)", "Dubrovnik (DBV)"],
+            "Cuba": ["Havana (HAV)", "Varadero (VRA)"],
+            "Czech Republic": ["Prague (PRG)"],
+            "Denmark": ["Copenhagen (CPH)", "Billund (BLL)"],
+            "Egypt": ["Cairo (CAI)", "Hurghada (HRG)", "Sharm El Sheikh (SSH)"],
+            "Ethiopia": ["Addis Ababa (ADD)"],
+            "Fiji": ["Nadi (NAN)", "Suva (SUV)"],
+            "Finland": ["Helsinki (HEL)", "Rovaniemi (RVN)"],
+            "France": ["Paris (CDG)", "Paris (ORY)", "Nice (NCE)", "Lyon (LYS)"],
+            "Germany": ["Frankfurt (FRA)", "Munich (MUC)", "Berlin (BER)", "Hamburg (HAM)"],
+            "Greece": ["Athens (ATH)", "Thessaloniki (SKG)", "Heraklion (HER)"],
+            "Hong Kong": ["Hong Kong (HKG)"],
+            "Hungary": ["Budapest (BUD)"],
+            "Iceland": ["Reykjavík (KEF)"],
+            "India": ["Delhi (DEL)", "Mumbai (BOM)", "Bangalore (BLR)", "Chennai (MAA)"],
+            "Indonesia": ["Jakarta (CGK)", "Bali (DPS)", "Surabaya (SUB)"],
+            "Ireland": ["Dublin (DUB)", "Shannon (SNN)", "Cork (ORK)"],
+            "Israel": ["Tel Aviv (TLV)"],
+            "Italy": ["Rome (FCO)", "Milan (MXP)", "Venice (VCE)", "Naples (NAP)"],
+            "Jamaica": ["Montego Bay (MBJ)", "Kingston (KIN)"],
+            "Japan": ["Tokyo (HND)", "Tokyo (NRT)", "Osaka (KIX)", "Fukuoka (FUK)"],
+            "Jordan": ["Amman (AMM)"],
+            "Kenya": ["Nairobi (NBO)", "Mombasa (MBA)"],
+            "Kuwait": ["Kuwait City (KWI)"],
+            "Lebanon": ["Beirut (BEY)"],
+            "Malaysia": ["Kuala Lumpur (KUL)", "Kota Kinabalu (BKI)", "Penang (PEN)"],
+            "Maldives": ["Male (MLE)"],
+            "Mexico": ["Mexico City (MEX)", "Cancún (CUN)", "Guadalajara (GDL)"],
+            "Morocco": ["Casablanca (CMN)", "Marrakesh (RAK)"],
+            "Netherlands": ["Amsterdam (AMS)", "Eindhoven (EIN)"],
+            "New Zealand": ["Auckland (AKL)", "Christchurch (CHC)", "Wellington (WLG)"],
+            "Nigeria": ["Lagos (LOS)", "Abuja (ABV)"],
+            "Norway": ["Oslo (OSL)", "Bergen (BGO)"],
+            "Oman": ["Muscat (MCT)"],
+            "Pakistan": ["Karachi (KHI)", "Lahore (LHE)", "Islamabad (ISB)"],
+            "Panama": ["Panama City (PTY)"],
+            "Peru": ["Lima (LIM)"],
+            "Philippines": ["Manila (MNL)", "Cebu (CEB)", "Davao (DVO)", "Clark (CRK)"],
+            "Poland": ["Warsaw (WAW)", "Kraków (KRK)"],
+            "Portugal": ["Lisbon (LIS)", "Porto (OPO)", "Faro (FAO)"],
+            "Qatar": ["Doha (DOH)"],
+            "Russia": ["Moscow (SVO)", "Moscow (DME)", "St. Petersburg (LED)"],
+            "Saudi Arabia": ["Riyadh (RUH)", "Jeddah (JED)", "Dammam (DMM)"],
+            "Singapore": ["Singapore (SIN)"],
+            "South Africa": ["Johannesburg (JNB)", "Cape Town (CPT)", "Durban (DUR)"],
+            "South Korea": ["Seoul (ICN)", "Seoul (GMP)", "Busan (PUS)"],
+            "Spain": ["Madrid (MAD)", "Barcelona (BCN)", "Palma de Mallorca (PMI)"],
+            "Sri Lanka": ["Colombo (CMB)"],
+            "Sweden": ["Stockholm (ARN)", "Gothenburg (GOT)"],
+            "Switzerland": ["Zurich (ZRH)", "Geneva (GVA)"],
+            "Taiwan": ["Taipei (TPE)", "Kaohsiung (KHH)"],
+            "Thailand": ["Bangkok (BKK)", "Bangkok (DMK)", "Phuket (HKT)", "Chiang Mai (CNX)"],
+            "Turkey": ["Istanbul (IST)", "Istanbul (SAW)", "Antalya (AYT)"],
+            "Ukraine": ["Kyiv (KBP)", "Lviv (LWO)"],
+            "United Arab Emirates": ["Dubai (DXB)", "Abu Dhabi (AUH)", "Sharjah (SHJ)"],
+            "United Kingdom": ["London (LHR)", "London (LGW)", "Manchester (MAN)", "Edinburgh (EDI)"],
+            "Vietnam": ["Ho Chi Minh City (SGN)", "Hanoi (HAN)", "Da Nang (DAD)"]
+        };
+
+        function updateCities(type) {
+            const countrySelect = document.getElementById(type + '_country');
+            const citySelect = document.getElementById(type + '_city');
+            const selectedCountry = countrySelect.value;
+
+            citySelect.innerHTML = '<option value="">-- Select City --</option>';
+
+            if (selectedCountry && cityData[selectedCountry]) {
+                cityData[selectedCountry].forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.textContent = city;
+                    citySelect.appendChild(option);
+                });
+            }
+        }
+
+        function toggleReturn() {
+            const tripType = document.querySelector('input[name="trip_type"]:checked').value;
+            const returnSection = document.getElementById('return-section');
+            if (returnSection) {
+                returnSection.style.display = (tripType === 'round trip') ? 'block' : 'none';
+            }
+        }
+        window.onload = toggleReturn;
+    </script>
 </head>
 <body style="height: fit-content;">
     <div class="header">
         <h2 style="margin: 32px auto auto 20px;">SkyLine Admin</h2>
     </div>
+
 <div class="allbody" style="display: flex;">
-    <!-- NAVIGATION -->
-        <div class="nav" style="width: 200px;height: 100vh; position: fixed; top: 100px">
-            <ul >
+        <div class="nav" style="width: 200px; height: 100vh; position: fixed; top: 100px">
+            <ul>
                 <li class="major"><a href="{{ url_for('index') }}">&#9992; Home</a></li>
                 <li class="major"><a href="#">&#9992; Tickets</a></li>
-                    <li class="minor"><a href="{{ url_for('addtickets') }}">Add Tickets</a></li>
-                    <li class="minor"><a href="{{ url_for('edittickets') }}">Edit Tickets</a></li>
-                    <li class="minor"><a href="{{ url_for('addpromos') }}">Add Promos</a></li>
-                    <li class="minor"><a href="{{ url_for('editpromos') }}">Edit Promos</a></li>
-                    <li class="minor"><a href="{{ url_for('archivetickets') }}">Archived Tickets</a></li>
-                    <li class="minor"><a href="{{ url_for('archivepromos') }}">Archived Tickets</a></li>                     
+                <li class="minor"><a href="{{ url_for('addtickets') }}">Add Tickets</a></li>
+                <li class="minor"><a href="{{ url_for('addpromos') }}">Add Promos</a></li>
+                <li class="minor"><a href="{{ url_for('editpromos') }}">Edit Promos</a></li>
+                <li class="minor"><a href="{{ url_for('archivetickets') }}">Archived Tickets</a></li>
+                <li class="minor"><a href="{{ url_for('archivepromos') }}">Archived Tickets</a></li>                     
                 <li class="major"><a href="#">&#9992; Booking</a></li>
-                    <li class="minor"><a href="{{ url_for('managebook') }}">Manage Bookings</a></li>
-                    <li class="minor"><a href="{{ url_for('archivebook') }}">Archived Bookings</a></li>
+                <li class="minor"><a href="{{ url_for('managebook') }}">Manage Bookings</a></li>
+                <li class="minor"><a href="{{ url_for('archivebook') }}">Archived Bookings</a></li>
                 <li class="major"><a href="#">&#9992; Users</a></li>
-                    <li class="minor"><a href="{{ url_for('manageuser') }}">Manage Users</a></li>
+                <li class="minor"><a href="{{ url_for('manageuser') }}">Manage Users</a></li>
                 <li class="major"><a href="{{ url_for('logs') }}">&#9992; Logs</a></li>
             </ul>
         </div>
-        <!-- FORMS -->       
-        
 
+        <div class="main-content" style="margin-left: 220px; padding: 20px; width: 100%;">
+            <div class="form-container">
+                <form action="{{ url_for('edittickets', flight_id=flight.id) }}" method="POST">
+                    <h2 style="color: #004d4d;">Update Flight Ticket #{{ flight.id }}</h2>
+
+                    <div class="form-section">
+                        <h3>Flight Type</h3>
+                        <div class="radio-group">
+                            <input type="radio" name="trip_type" value="one way trip" id="oneway" onclick="toggleReturn()" {% if flight.trip_type == 'one way trip' %}checked{% endif %}>
+                            <label for="oneway">One Way</label>
+                            <input type="radio" name="trip_type" value="round trip" id="roundtrip" onclick="toggleReturn()" {% if flight.trip_type == 'round trip' %}checked{% endif %}>
+                            <label for="roundtrip">Round Trip</label>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>From Country (Currently: {{ flight.from_country }})</label>
+                            <select name="from_country" id="from_country" onchange="updateCities('from')" required>
+                                <option value="">-- Select Country --</option>
+                                {% for country in countries %}
+                                <option value="{{ country }}" {% if flight.from_country == country %}selected{% endif %}>{{ country }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>From City</label>
+                            <select name="from_city" id="from_city" required>
+                                <option value="{{ flight.from_city }}">{{ flight.from_city }}</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>To Country (Currently: {{ flight.to_country }})</label>
+                            <select name="to_country" id="to_country" onchange="updateCities('to')" required>
+                                <option value="">-- Select Country --</option>
+                                {% for country in ["Afghanistan", "Australia", "Japan", "Philippines", "United States"] %}
+                                <option value="{{ country }}" {% if flight.to_country == country %}selected{% endif %}>{{ country }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>To City</label>
+                            <select name="to_city" id="to_city" required>
+                                <option value="{{ flight.to_city }}">{{ flight.to_city }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Departure Date</label>
+                            <input type="date" name="dep_date" value="{{ flight.dep_date }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Departure Time</label>
+                            <input type="time" name="dep_time" value="{{ flight.dep_time }}" required>
+                        </div>
+                    </div>
+
+                    <div id="return-section" style="display: {{ 'block' if flight.trip_type == 'round trip' else 'none' }};">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Return Date</label>
+                                <input type="date" name="ret_date" value="{{ flight.ret_date }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Return Time</label>
+                                <input type="time" name="ret_time" value="{{ flight.ret_time }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Economy Class Tickets</label>
+                            <input type="number" name="tickets_economy" value="{{ flight.tickets_economy }}" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Business Class Tickets</label>
+                            <input type="number" name="tickets_business" value="{{ flight.tickets_business }}" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>First Class Tickets</label>
+                            <input type="number" name="tickets_first" value="{{ flight.tickets_first }}" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Base Price (PHP)</label>
+                            <input type="number" step="0.01" name="price" value="{{ flight.price }}" required>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px; margin-top: 20px;">
+                        <button type="submit" class="submit-btn" style="flex: 2;">UPDATE FLIGHT TICKET</button>
+                        <a href="{{ url_for('admin_dashboard') }}" class="submit-btn" style="flex: 1; background: #666; text-align: center; text-decoration: none;">CANCEL</a>
+                    </div>
+                </form>
+            </div>
+        </div>
 </div>
-    </body>
+</body>
 </html>
